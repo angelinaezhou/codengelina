@@ -1,0 +1,24 @@
+.game-card {
+    width: 163px;
+    height: 92px;
+    border-radius: 21px;
+    border: none;
+    padding: 19px 37px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    font-family: 'Radio Canada';
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: inset 0 6px 8px rgba(0,0,0,0.5);
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            inset 0 6px 8px rgba(0,0,0,0.5),
+            0 6px 12px rgba(0,0,0,0.3),
+            0 0 15px rgba(255,255,255,0.3);
+        transition: all 0.2s ease;
+    }
+}

@@ -1,0 +1,20 @@
+.team-scores {
+    width: 308px;
+    height: 66px;
+    gap: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pink-score {
+    font-family: 'Orbit';
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.blue-score {
+    font-weight: bold;
+    font-size: 20px;
+    font-family: 'Orbit';
+}

@@ -1,38 +1,161 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.header {
+  width: 791px;
+  height: 230px;
+  left: 268px;
+  top: 56px;
+  position: absolute;
   display: flex;
+  align-items: center;
   flex-direction: column;
+}
+
+.title {
+  width: 467px;
+  height: 78px;
+  display: flex;
+}
+
+.codengelina {
+  font-family: 'Questrial';
+  color: white;
+  font-weight: bold;
+  font-size: 48px;
+  padding-top: 12px;
+  padding-left: 37px;
+}
+
+.question {
+  color: white;
+  width: 31px;
+  height: 31px;
+  padding-top: 20px;
+  padding-left: 12px;
+}
+
+.view-description {
+  color: white;
+  font-family: 'Orbit';
+  font-weight: 500;
+  font-size: 15px;
+  margin-top: 8px;
+}
+
+.subheader {
+  width: 617px;
+  height: 81px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  gap: 100px;
+}
+
+.controls {
+  width: 248px;
+  height: 61px;
+  margin-left: 99px;
+  display: flex;
+  align-items: center;
+}
+
+.player-side {
+  font-family: 'Orbit';
   color: white;
+  font-size: 15px;
 }
 
-.App-link {
-  color: #61dafb;
+.toggle-button {
+  background-color: transparent;
+  cursor: pointer;
+  border: none;
+  margin-top: 7px;
+  margin-left: 4px;
+  margin-right: 4px;
+
+  &:hover {
+    transition: all 0.2s ease;
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  }
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.spymaster-side {
+  font-family: 'Orbit';
+  color: white;
+  font-size: 15px;
+}
+
+.new-game {
+  cursor: pointer;
+  border-radius: 30px;
+  border: 1px white solid;
+  background-color: transparent;
+  width: 180px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    transform: translateY(-3px);
+    transition: all 0.2s ease;
+    box-shadow: inset 0 0 12px rgba(255,255,255,0.4);
+    border: 2px white solid;
   }
-  to {
-    transform: rotate(360deg);
+}
+
+.replay {
+  margin-left: 25px;
+}
+
+.new-game-text {
+  font-family: 'Orbit';
+  color: white;
+  margin-left: 12px;
+  margin-bottom: 2px;
+  font-size: 15px;
+}
+
+.status {
+  width: 979px;
+  height: 66px;
+  position: absolute;
+  left: 190px;
+  top: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 530px;
+}
+
+.end-turn {
+  border-radius: 30px;
+  border: 2px white solid;
+  width: 150px;
+  height: 33px;
+  background-color: transparent;
+  font-family: 'Orbit';
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+
+  &:hover {
+    transition: all 0.2s ease;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.4);
   }
+}
+
+.grid-container {
+  width: 1000px;
+  height: 623px;
+  border-radius: 30px;
+  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+  left: 200px;
+  top: 300px;
+  position: absolute;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 32px 36px;
+  padding: 15px 17px;
 }
