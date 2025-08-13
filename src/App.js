@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import {Eye, EyeOff, RotateCcw, Users, CircleQuestionMark, ToggleLeft, ToggleRight } from "lucide-react"
 import GameCard from "./GameCard";
 import GameStatus from "./GameStatus";
-import './App.css'
+import './App.css';
+import { ref, onValue, set, serverTimestamp } from 'firebase/database';
+import { database } from "./firebase";
+import Info from "./Info";
 
 const WORDS = [
   "AFRICA", "AGENT", "AIR", "ALIEN", "ALPS", "AMAZON", "AMBULANCE", "AMERICA", "ANGEL", "ANTARCTICA",
@@ -66,6 +69,10 @@ const COLORS = {
   }
 };
 
+const generateRoomId = () => {
+  return Math.random().toString(36).substring(2, 8).toLowerCase();
+}
+
 const generateGame = ()  => {
   const shuffled = [...WORDS].sort(() => Math.random() - 0.5); 
   const gameWords = shuffled.slice(0, 25); 
@@ -101,87 +108,162 @@ const generateGame = ()  => {
     currentTeam: startingTeam, 
     gameOver: false,
     winner: null,
-    pinkRemaining: 9, 
-    blueRemaining: 8
+    pinkRemaining: startingTeam === 'pink' ? 9 : 8, 
+    blueRemaining: startingTeam === 'blue' ? 9 : 8, 
+    createdAt: serverTimestamp()
   };
 };
 
 function App() {
-  const [game, setGame] = useState(() => generateGame()); 
+  const [game, setGame] = useState(null); 
   const [spymasterView, setSpymasterView] = useState(false); 
+  const [roomId, setRoomId] = useState(null); 
+  const [loading, setLoading] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
+
+  // initialize room and sync with firebase
+  useEffect(() => {
+    console.log("useEffect started");
+    
+    // get room ID from URL or create new one
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentRoomId = urlParams.get('room');
+    
+    if (!currentRoomId) {
+      currentRoomId = generateRoomId();
+      window.history.pushState({}, '', `?room=${currentRoomId}`);
+    }
+    
+    console.log("Room ID:", currentRoomId);
+    setRoomId(currentRoomId);
+  
+    // set up firebase listener
+    const gameRef = ref(database, `games/${currentRoomId}`);
+    console.log("Setting up Firebase listener for:", `games/${currentRoomId}`);
+    
+    const unsubscribe = onValue(gameRef, (snapshot) => {
+      console.log("Firebase data received:", snapshot.val());
+      
+      const data = snapshot.val();
+      if (data) {
+        console.log("Using existing game data");
+        setGame(data);
+      } else {
+        console.log("No game exists, creating new one");
+        // no game exists, create new one
+        const newGame = generateGame();
+        console.log("New game created:", newGame);
+        set(gameRef, newGame);
+        setGame(newGame);
+      }
+      console.log("Setting loading to false");
+      setLoading(false);
+    }, (error) => {
+      console.error("Firebase error:", error);
+      setLoading(false);
+    });
+  
+    return () => {
+      console.log("Cleaning up Firebase listener");
+      unsubscribe();
+    };
+  }, []);
 
   const newGame = () => {
-    setGame(generateGame())
+    if (!roomId) return; 
+
+    const newGameState = generateGame(); 
+    setSpymasterView(false)
+
+    const gameRef = ref(database, `games/${roomId}`);
+    set(gameRef, newGameState); 
   };
 
   const endTurn = () => {
-    if (game.gameOver) return; 
+    if (!game || game.gameOver || !roomId) return; 
 
-    setGame(prevGame => ({
-      ...prevGame, 
-      currentTeam: prevGame.currentTeam === 'pink' ? 'blue' : 'pink'
-    }));
-  }
+    const updatedGame = {
+      ...game, 
+      currentTeam: game.currentTeam === 'pink' ? 'blue' : 'pink'
+    }; 
+
+    const gameRef = ref(database, `games/${roomId}`);
+    set(gameRef, updatedGame); 
+  };
 
   const revealCard = (cardId) => {
-    if (game.gameOver) return; 
+    if (spymasterView) return;
 
-    setGame(prevGame => {
-      const newCards = prevGame.cards.map(card =>
-        card.id === cardId? { ...card, revealed: true } : card
-      );
+    if (!game || game.gameOver || !roomId) return;
 
-      const revealedCard = prevGame.cards.find(card => card.id === cardId); 
-      if (revealedCard.revealed) return prevGame; // already revealed
+    const revealedCard = game.cards.find(card => card.id === cardId); 
+    if (revealedCard.revealed) return ; // already revealed
 
-      let newGameOver = false; 
-      let newWinner = null; 
-      let newCurrentTeam = prevGame.currentTeam; 
-      let newPinkRemaining = prevGame.pinkRemaining; 
-      let newBlueRemaining = prevGame.blueRemaining; 
+    const newCards = game.cards.map(card => 
+      card.id === cardId ? { ...card, revealed: true } : card
+    ); 
 
-      // check what was revealed
-      if (revealedCard.type === 'assassin') {
+    let newGameOver = false; 
+    let newWinner = null; 
+    let newCurrentTeam = game.currentTeam; 
+    let newPinkRemaining = game.pinkRemaining; 
+    let newBlueRemaining = game.blueRemaining; 
+
+    if (revealedCard.type === 'assassin') {
+      newGameOver = true; 
+      newWinner = game.currentTeam === 'pink' ? 'blue' : 'pink';
+    } else if (revealedCard.type === 'pink') {
+      newPinkRemaining--; 
+      if (newPinkRemaining === 0) {
         newGameOver = true; 
-        newWinner = prevGame.currentTeam === 'pink' ? 'blue' : 'pink'; 
-      } else if (revealedCard.type === 'pink') {
-        newPinkRemaining--;
-        if (newPinkRemaining === 0) {
-          newGameOver = true; 
-          newWinner = 'pink'; 
-        } else if (prevGame.currentTeam !== 'pink') {
-          newCurrentTeam = 'blue';
-        }
-      }  else if (revealedCard.type === 'blue') {
-        newBlueRemaining--;
-        if (newBlueRemaining === 0) {
-          newGameOver = true; 
-          newWinner = 'blue'; 
-        } else if (prevGame.currentTeam !== 'blue') {
-          newCurrentTeam = 'pink';
-        }
-      } else {
-        newCurrentTeam = prevGame.currentTeam === 'pink' ? 'blue' : 'pink';
+        newWinner = 'pink'; 
+      } else if (game.currentTeam !== 'pink') {
+        newCurrentTeam = game.currentTeam === 'pink' ? 'blue' : 'pink';
       }
+    } else if (revealedCard.type === 'blue') {
+      newBlueRemaining--; 
+      if (newBlueRemaining === 0) {
+        newGameOver = true; 
+        newWinner = 'blue';
+      } else if (game.currentTeam !== 'blue') {
+        newCurrentTeam = game.currentTeam === 'pink' ? 'blue' : 'pink';
+      }
+    } else {
+      newCurrentTeam = game.currentTeam === 'pink' ? 'blue' : 'pink';
+    }
 
-      return {
-        ...prevGame, 
-        cards: newCards,
-        currentTeam: newCurrentTeam,
-        gameOver: newGameOver, 
-        winner: newWinner, 
-        pinkRemaining: newPinkRemaining, 
-        blueRemaining: newBlueRemaining
-      };
-    });
+    const updatedGame = {
+      ...game, 
+      cards: newCards, 
+      currentTeam: newCurrentTeam, 
+      gameOver: newGameOver, 
+      winner: newWinner, 
+      pinkRemaining: newPinkRemaining, 
+      blueRemaining: newBlueRemaining
+    };
+
+    const gameRef = ref(database, `games/${roomId}`); 
+      set(gameRef, updatedGame); 
   };
+
+  if (loading || !game) {
+    return (
+      <div className='loading'>
+        <div>LOADING GAME...</div>
+        {roomId && <div>room: {roomId}</div>}
+      </div>
+    );
+  }
 
   return (
     <>
     <div className='header'>
       <div className='title'>
         <span className='codengelina'>CODENGELINA</span>
-        <CircleQuestionMark className="question" />
+        <CircleQuestionMark className="question" onClick={() => setShowInfo(true)} style={{cursor: 'pointer'}}/>
+      </div>
+      <div className='room-info'>
+        room:  {roomId}  |  share this link to play with friends!
       </div>
       <div className="view-description">
         {spymasterView ? "Spymaster View - You Can See All Card Colors" : "Field Operative View - Click Cards to Reveal"}
@@ -201,7 +283,7 @@ function App() {
       </div>
 
       <button className="new-game" onClick={newGame}>
-        <RotateCcw color='white' size={30} className="replay" />
+        <RotateCcw color='white' size={20} className="replay" />
         <div className="new-game-text">new game</div>
       </button>
     </div>
@@ -228,12 +310,27 @@ function App() {
             key={card.id}
             card={card}
             spymasterView={spymasterView}
+            gameOver={game.gameOver}
             onCardClick={revealCard}
             colors={COLORS}
           />
         )))}
       </div>
     </div>
+
+    {showInfo && (
+      <div className="modal-overlay" onClick={() => setShowInfo(false)}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <button 
+            className="close-button" 
+            onClick={() => setShowInfo(false)}
+          >
+            ×
+          </button>
+          <Info />
+        </div>
+      </div>
+    )}
     </>
   )
 }

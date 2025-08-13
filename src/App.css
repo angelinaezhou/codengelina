@@ -1,8 +1,9 @@
 .header {
   width: 791px;
   height: 230px;
-  left: 268px;
+  left: 50%;
   top: 56px;
+  transform: translate(-50%, -0%);
   position: absolute;
   display: flex;
   align-items: center;
@@ -24,6 +25,11 @@
   padding-left: 37px;
 }
 
+.room-info {
+  font-family: 'Questrial';
+  color: rgb(173, 173, 173);
+}
+
 .question {
   color: white;
   width: 31px;
@@ -37,7 +43,8 @@
   font-family: 'Orbit';
   font-weight: 500;
   font-size: 15px;
-  margin-top: 8px;
+  margin-top: 30px;
+  left: 50%;
 }
 
 .subheader {
@@ -52,9 +59,10 @@
 .controls {
   width: 248px;
   height: 61px;
-  margin-left: 99px;
+  margin-left: 0px;
   display: flex;
   align-items: center;
+  margin-top: 20px;
 }
 
 .player-side {
@@ -84,12 +92,13 @@
 }
 
 .new-game {
+  margin-top: 20px;
   cursor: pointer;
   border-radius: 30px;
   border: 1px white solid;
   background-color: transparent;
-  width: 180px;
-  height: 50px;
+  width: 160px;
+  height: 40px;
   display: flex;
   align-items: center;
 
@@ -102,14 +111,14 @@
 }
 
 .replay {
-  margin-left: 25px;
+  margin-left: 20px;
 }
 
 .new-game-text {
   font-family: 'Orbit';
   color: white;
   margin-left: 12px;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   font-size: 15px;
 }
 
@@ -117,8 +126,9 @@
   width: 979px;
   height: 66px;
   position: absolute;
-  left: 190px;
-  top: 250px;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  top: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -128,8 +138,7 @@
 .end-turn {
   border-radius: 30px;
   border: 2px white solid;
-  width: 150px;
-  height: 33px;
+  padding: 10px 15px;
   background-color: transparent;
   font-family: 'Orbit';
   font-size: 10px;
@@ -140,22 +149,35 @@
   &:hover {
     transition: all 0.2s ease;
     box-shadow: inset 0 0 10px rgba(255,255,255,0.4);
+    transform: translateY(-3px);
   }
 }
 
 .grid-container {
   width: 1000px;
   height: 623px;
-  border-radius: 30px;
-  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
-  left: 200px;
-  top: 300px;
+  border-radius: 40px;
+  border: 5px rgb(138, 138, 138) hidden;
+  box-shadow: inset 0 0px 19px rgb(255, 255, 255);
+  left: 50%;
+  transform: translate(-50%, 0%);
+  top: 360px;
   position: absolute;
+  margin-bottom: 4rem;
+  padding: 20px;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 32px 36px;
-  padding: 15px 17px;
+  padding: 20px 22px;
+}
+
+.modal-overlay {
+  transition: 0.2s ease all;
+}
+
+.modal-content {
+  transition: 0.3s ease-out forwards;
 }

@@ -1,0 +1,38 @@
+.info-grid {
+    background-color: #484848;
+    border-radius: 40px;
+    z-index: 10;
+    line-height: 200%;
+    width: 960px;
+    height: 550px;
+    padding: 50px 50px;
+    left: 50%; 
+    top: 60%; 
+    transform: translate(-50%, -50%);
+    box-shadow: 0 10px 28px rgba(255, 255, 255, 0.4);
+    position: absolute;
+}
+
+.info-title {
+    font-family: 'Orbit';
+    color: white;
+    font-size: 32px;
+    font-weight: 500;
+}
+
+.info-grid h2 {
+    font-family: 'Radio Canada';
+    color: white;
+    font-size: 24px;
+}
+
+.close-button {
+    height: 1200px;
+    width: 1500px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    border: none;
+    opacity: 50%;
+}

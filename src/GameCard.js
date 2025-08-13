@@ -1,7 +1,7 @@
 import React from 'react'; 
 import './GameCard.css'
 
-const GameCard = ({ card, spymasterView, onCardClick, colors}) => {
+const GameCard = ({ card, spymasterView, gameOver, onCardClick, colors}) => {
     const getCardStyle = () => {
         if (card.revealed) {
             switch (card.type) {
@@ -33,6 +33,20 @@ const GameCard = ({ card, spymasterView, onCardClick, colors}) => {
             }
         }
 
+        if (gameOver) {
+            switch (card.type) {
+                case 'pink':
+                    return { backgroundColor: colors.pink.hidden };
+                case 'blue': 
+                    return { backgroundColor: colors.blue.hidden };
+                case 'neutral':
+                    return { backgroundColor: '#EEEEEE' }; 
+                case 'assassin':
+                    return { backgroundColor:  '#616161'};
+                default: 
+                    return {backgroundColor: '#EEEEEE'};
+            }
+        }
         return { backgroundColor: '#EEEEEE'};
     };
 
@@ -40,7 +54,14 @@ const GameCard = ({ card, spymasterView, onCardClick, colors}) => {
         if (card.revealed || (spymasterView && card.type === 'assassin')) {
             return 'white';
         } else if (spymasterView) {
-            
+            switch (card.type) {
+                case 'pink':
+                    return colors.pink.active;
+                case 'blue':
+                    return colors.blue.active;
+                default:
+                    return '#000000';
+            }
         }
         return '#000000';
     };
